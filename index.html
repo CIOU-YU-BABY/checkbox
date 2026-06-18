@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Checklist</title>
+  <title>出門清單</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -12,116 +12,99 @@
       max-width: 480px;
       margin: auto;
     }
+
     h1 {
       font-size: 28px;
-    }
-    .input-area {
-      display: flex;
-      gap: 8px;
       margin-bottom: 20px;
     }
-    input {
-      flex: 1;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 12px 16px;
-      border: none;
-      border-radius: 10px;
-      background: #007aff;
-      color: white;
-      font-size: 16px;
-    }
+
     .item {
       background: white;
-      padding: 14px;
+      padding: 16px;
       border-radius: 12px;
       margin-bottom: 10px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
+      font-size: 18px;
     }
-    .item label {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+
+    input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
     }
+
     .done {
       text-decoration: line-through;
       color: #999;
     }
-    .delete {
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
       background: #ff3b30;
-      padding: 8px 10px;
-      font-size: 14px;
+      color: white;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h1>My Checklist</h1>
-
-  <div class="input-area">
-    <input id="taskInput" placeholder="新增項目..." />
-    <button onclick="addTask()">新增</button>
-  </div>
+  <h1>出門清單</h1>
 
   <div id="list"></div>
 
-  <script>
-    let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  <button onclick="resetList()">全部取消勾選</button>
 
-    function saveTasks() {
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+  <script>
+    const items = [
+      "衣服",
+      "褲子",
+      "內衣",
+      "襪子 x3",
+      "化妝品"
+    ];
+
+    let checkedItems = JSON.parse(localStorage.getItem("checkedItems")) || {};
+
+    function save() {
+      localStorage.setItem("checkedItems", JSON.stringify(checkedItems));
     }
 
-    function renderTasks() {
+    function renderList() {
       const list = document.getElementById("list");
       list.innerHTML = "";
 
-      tasks.forEach((task, index) => {
-        const item = document.createElement("div");
-        item.className = "item";
+      items.forEach((item) => {
+        const row = document.createElement("label");
+        row.className = "item";
 
-        item.innerHTML = `
-          <label>
-            <input type="checkbox" ${task.done ? "checked" : ""} onchange="toggleTask(${index})" />
-            <span class="${task.done ? "done" : ""}">${task.text}</span>
-          </label>
-          <button class="delete" onclick="deleteTask(${index})">刪除</button>
+        const checked = checkedItems[item] || false;
+
+        row.innerHTML = `
+          <input type="checkbox" ${checked ? "checked" : ""} onchange="toggleItem('${item}')" />
+          <span class="${checked ? "done" : ""}">${item}</span>
         `;
 
-        list.appendChild(item);
+        list.appendChild(row);
       });
     }
 
-    function addTask() {
-      const input = document.getElementById("taskInput");
-      const text = input.value.trim();
-
-      if (!text) return;
-
-      tasks.push({ text, done: false });
-      input.value = "";
-      saveTasks();
-      renderTasks();
+    function toggleItem(item) {
+      checkedItems[item] = !checkedItems[item];
+      save();
+      renderList();
     }
 
-    function toggleTask(index) {
-      tasks[index].done = !tasks[index].done;
-      saveTasks();
-      renderTasks();
+    function resetList() {
+      checkedItems = {};
+      save();
+      renderList();
     }
 
-    function deleteTask(index) {
-      tasks.splice(index, 1);
-      saveTasks();
-      renderTasks();
-    }
-
-    renderTasks();
+    renderList();
   </script>
 </body>
 </html>
