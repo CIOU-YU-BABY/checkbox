@@ -12,6 +12,14 @@
       max-width: 520px;
       margin: auto;
       color: #4a2634;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .app {
+      position: relative;
+      z-index: 2;
     }
 
     h1 {
@@ -28,11 +36,12 @@
     }
 
     .category {
-      background: rgba(255, 255, 255, 0.78);
+      background: rgba(255, 255, 255, 0.82);
       border-radius: 18px;
       padding: 16px;
       margin-bottom: 16px;
       box-shadow: 0 8px 24px rgba(190, 75, 120, 0.14);
+      backdrop-filter: blur(6px);
     }
 
     .category-header {
@@ -77,16 +86,157 @@
       margin-top: 10px;
       box-shadow: 0 8px 20px rgba(255, 105, 166, 0.28);
     }
+
+    .polar-bear {
+      position: fixed;
+      right: -35px;
+      bottom: -10px;
+      width: 230px;
+      height: 190px;
+      z-index: 1;
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .bear-body {
+      position: absolute;
+      width: 165px;
+      height: 105px;
+      background: #ffffff;
+      border-radius: 55% 55% 45% 45%;
+      left: 35px;
+      bottom: 18px;
+      box-shadow: inset -12px -12px 0 rgba(230, 235, 245, 0.8);
+    }
+
+    .bear-head {
+      position: absolute;
+      width: 92px;
+      height: 82px;
+      background: #ffffff;
+      border-radius: 50%;
+      left: 18px;
+      bottom: 70px;
+      box-shadow: inset -8px -8px 0 rgba(230, 235, 245, 0.8);
+    }
+
+    .ear {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      background: #ffffff;
+      border-radius: 50%;
+      top: 28px;
+    }
+
+    .ear.left {
+      left: 22px;
+    }
+
+    .ear.right {
+      left: 78px;
+    }
+
+    .ear::after {
+      content: "";
+      position: absolute;
+      width: 15px;
+      height: 15px;
+      background: #ffd6e8;
+      border-radius: 50%;
+      left: 6px;
+      top: 7px;
+    }
+
+    .eye {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      background: #3d2a30;
+      border-radius: 50%;
+      bottom: 114px;
+    }
+
+    .eye.left {
+      left: 48px;
+    }
+
+    .eye.right {
+      left: 78px;
+    }
+
+    .snout {
+      position: absolute;
+      width: 38px;
+      height: 28px;
+      background: #f5f7fb;
+      border-radius: 50%;
+      left: 51px;
+      bottom: 88px;
+    }
+
+    .nose {
+      position: absolute;
+      width: 13px;
+      height: 9px;
+      background: #3d2a30;
+      border-radius: 50%;
+      left: 64px;
+      bottom: 105px;
+    }
+
+    .paw {
+      position: absolute;
+      width: 42px;
+      height: 30px;
+      background: #ffffff;
+      border-radius: 50%;
+      bottom: 8px;
+      box-shadow: inset -5px -5px 0 rgba(230, 235, 245, 0.9);
+    }
+
+    .paw.one {
+      left: 58px;
+    }
+
+    .paw.two {
+      left: 145px;
+    }
+
+    .heart {
+      position: absolute;
+      left: 120px;
+      bottom: 130px;
+      font-size: 26px;
+      color: #ff69a6;
+      transform: rotate(12deg);
+    }
   </style>
 </head>
 
 <body>
-  <h1>小寶貝的過夜清單</h1>
-  <div class="subtitle">出門前確認一下，才不會漏東西 ♡</div>
+  <div class="polar-bear" aria-hidden="true">
+    <div class="bear-body"></div>
+    <div class="ear left"></div>
+    <div class="ear right"></div>
+    <div class="bear-head"></div>
+    <div class="eye left"></div>
+    <div class="eye right"></div>
+    <div class="snout"></div>
+    <div class="nose"></div>
+    <div class="paw one"></div>
+    <div class="paw two"></div>
+    <div class="heart">♡</div>
+  </div>
 
-  <div id="list"></div>
+  <div class="app">
+    <h1>小寶貝的過夜清單</h1>
+    <div class="subtitle">出門前確認一下，才不會漏東西 ♡</div>
 
-  <button onclick="resetList()">全部取消勾選</button>
+    <div id="list"></div>
+
+    <button onclick="resetList()">全部取消勾選</button>
+  </div>
 
   <script>
     const categories = [
