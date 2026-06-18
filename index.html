@@ -3,99 +3,175 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>出門清單</title>
+  <title>小寶貝的過夜清單</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f6f7f9;
+      background: linear-gradient(180deg, #ffd6e8 0%, #fff1f7 100%);
       padding: 20px;
-      max-width: 480px;
+      max-width: 520px;
       margin: auto;
+      color: #4a2634;
     }
 
     h1 {
-      font-size: 28px;
-      margin-bottom: 20px;
+      font-size: 30px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #8a5268;
+      margin-bottom: 24px;
+      font-size: 15px;
+    }
+
+    .category {
+      background: rgba(255, 255, 255, 0.78);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(190, 75, 120, 0.14);
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #7b2947;
     }
 
     .item {
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 18px;
+      gap: 10px;
+      padding: 11px 4px;
+      font-size: 17px;
+      border-top: 1px solid rgba(180, 90, 125, 0.15);
     }
 
     input[type="checkbox"] {
       width: 22px;
       height: 22px;
+      accent-color: #ff69a6;
     }
 
     .done {
       text-decoration: line-through;
-      color: #999;
+      color: #b58a9b;
     }
 
     button {
-      margin-top: 20px;
       width: 100%;
-      padding: 14px;
+      padding: 15px;
       border: none;
-      border-radius: 12px;
-      background: #ff3b30;
+      border-radius: 16px;
+      background: #ff69a6;
       color: white;
-      font-size: 16px;
+      font-size: 17px;
+      font-weight: 700;
+      margin-top: 10px;
+      box-shadow: 0 8px 20px rgba(255, 105, 166, 0.28);
     }
   </style>
 </head>
 <body>
-  <h1>出門清單</h1>
+  <h1>小寶貝的過夜清單</h1>
+  <div class="subtitle">出門前確認一下，才不會漏東西 ♡</div>
 
   <div id="list"></div>
 
   <button onclick="resetList()">全部取消勾選</button>
 
   <script>
-    const items = [
-      "衣服",
-      "褲子",
-      "內衣",
-      "襪子 x3",
-      "化妝品"
+    const categories = [
+      {
+        name: "盥洗用品",
+        items: ["牙刷牙膏", "洗髮精", "護髮", "私密處沐浴乳", "洗面乳"]
+      },
+      {
+        name: "保養與卸妝",
+        items: ["保養品", "梳子", "面膜", "卸妝巾", "洗臉巾"]
+      },
+      {
+        name: "電子用品",
+        items: ["充電器", "手錶 / 充手錶"]
+      },
+      {
+        name: "衣物與日用品",
+        items: ["換洗衣物", "衛生紙", "刮鬍刀"]
+      }
     ];
 
-    let checkedItems = JSON.parse(localStorage.getItem("checkedItems")) || {};
+    let checkedItems = JSON.parse(localStorage.getItem("overnightChecklist")) || {};
 
     function save() {
-      localStorage.setItem("checkedItems", JSON.stringify(checkedItems));
+      localStorage.setItem("overnightChecklist", JSON.stringify(checkedItems));
+    }
+
+    function itemKey(categoryName, itemName) {
+      return categoryName + "-" + itemName;
+    }
+
+    function isCategoryDone(category) {
+      return category.items.every(item => checkedItems[itemKey(category.name, item)]);
+    }
+
+    function toggleItem(categoryName, itemName) {
+      const key = itemKey(categoryName, itemName);
+      checkedItems[key] = !checkedItems[key];
+      save();
+      renderList();
+    }
+
+    function toggleCategory(categoryIndex) {
+      const category = categories[categoryIndex];
+      const shouldCheck = !isCategoryDone(category);
+
+      category.items.forEach(item => {
+        checkedItems[itemKey(category.name, item)] = shouldCheck;
+      });
+
+      save();
+      renderList();
     }
 
     function renderList() {
       const list = document.getElementById("list");
       list.innerHTML = "";
 
-      items.forEach((item) => {
-        const row = document.createElement("label");
-        row.className = "item";
+      categories.forEach((category, categoryIndex) => {
+        const categoryBox = document.createElement("div");
+        categoryBox.className = "category";
 
-        const checked = checkedItems[item] || false;
+        const categoryChecked = isCategoryDone(category);
 
-        row.innerHTML = `
-          <input type="checkbox" ${checked ? "checked" : ""} onchange="toggleItem('${item}')" />
-          <span class="${checked ? "done" : ""}">${item}</span>
+        let html = `
+          <label class="category-header">
+            <input type="checkbox" ${categoryChecked ? "checked" : ""} onchange="toggleCategory(${categoryIndex})" />
+            <span class="${categoryChecked ? "done" : ""}">${category.name}</span>
+          </label>
         `;
 
-        list.appendChild(row);
-      });
-    }
+        category.items.forEach(item => {
+          const key = itemKey(category.name, item);
+          const checked = checkedItems[key] || false;
 
-    function toggleItem(item) {
-      checkedItems[item] = !checkedItems[item];
-      save();
-      renderList();
+          html += `
+            <label class="item">
+              <input type="checkbox" ${checked ? "checked" : ""} onchange="toggleItem('${category.name}', '${item}')" />
+              <span class="${checked ? "done" : ""}">${item}</span>
+            </label>
+          `;
+        });
+
+        categoryBox.innerHTML = html;
+        list.appendChild(categoryBox);
+      });
     }
 
     function resetList() {
